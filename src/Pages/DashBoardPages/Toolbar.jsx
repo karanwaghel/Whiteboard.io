@@ -21,7 +21,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useWhiteBoard } from "@/ComponentProject/Context/DashBoardContext";
 import { useAuth } from "@/ComponentProject/Context/AuthContext";
-import { HexColorPicker, HexColorInput } from "react-colorful";
 
 const TOOLS = [
   { value: "cursor", label: "Selection", icon: MousePointer },
@@ -90,8 +89,8 @@ export default function Toolbar() {
             onValueChange={(val) => val && setTool(val)}
             className="gap-2"
           >
-            {TOOLS.map((tool) => (
-              <ToggleGroupItem value={tool.value} className={itemClasses}>
+            {TOOLS.map((tool,index) => (
+              <ToggleGroupItem value={tool.value} className={itemClasses} key={index}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="flex items-center justify-center w-full h-full">

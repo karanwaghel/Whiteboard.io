@@ -63,8 +63,9 @@ function HomePage() {
 
   return (
     <>
-    {
-      <UtilsTab />
+    { 
+       Tool && Tool.length > 0 ?
+       <UtilVisible/> : '' 
     }
       <div className="h-screen w-screen overflow-hidden">
         <TooltipProvider delayDuration={300}>
