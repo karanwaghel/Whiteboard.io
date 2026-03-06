@@ -38,19 +38,7 @@ export default function Toolbar() {
   const { setTool } = useWhiteBoard();
   const { LogOut } = useAuth();
 
-  const handletoolSelection = (value) => {
-    if (value) {
-      setTool(value);
-    }
-  };
 
-  const handelLogout = async () => {
-    try {
-      await LogOut();
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const ToolTipButton = ({ children, label }) => (
     <Tooltip>
@@ -71,6 +59,7 @@ export default function Toolbar() {
   `;
 
   return (
+    
     <div className="h-16 w-full p-4">
       <div className="flex justify-between items-center">
         <ToolTipButton label="Menu">
@@ -85,7 +74,7 @@ export default function Toolbar() {
         <div className="shadow-md shadow-[#414753] rounded-full p-1 px-3 bg-white border">
           <ToggleGroup
             type="single"
-            defaultValue="pen"
+            
             onValueChange={(val) => val && setTool(val)}
             className="gap-2"
           >

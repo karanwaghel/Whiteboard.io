@@ -2,8 +2,9 @@ import { TooltipProvider } from "@radix-ui/react-tooltip";
 import Toolbar from "./Toolbar";
 import { useWhiteBoard } from "@/ComponentProject/Context/DashBoardContext";
 import { Stage, Layer, Line } from "react-konva";
-import { useRef, useState } from "react";
+import { useRef} from "react";
 import UtilsTab from "./UtilityTab";
+import { Tools_config } from "@/ComponentProject/config/ToolsConfig";
 
 
 
@@ -18,7 +19,7 @@ function HomePage() {
   } = useWhiteBoard();
 
   const stageref = useRef(null);
-  const [UtilVisible,setUtilVisible] = useState(false)
+  const ActiveToolCofig = Tools_config[Tool]
 
 
   const handleMouseDown = (e) => {
@@ -64,8 +65,9 @@ function HomePage() {
   return (
     <>
     { 
-       Tool && Tool.length > 0 ?
-       <UtilVisible/> : '' 
+      ActiveToolCofig && (ActiveToolCofig.hasStroke || ActiveToolCofig.hasColor) && (
+        <UtilsTab config={ActiveToolCofig}/>  
+      )
     }
       <div className="h-screen w-screen overflow-hidden">
         <TooltipProvider delayDuration={300}>
