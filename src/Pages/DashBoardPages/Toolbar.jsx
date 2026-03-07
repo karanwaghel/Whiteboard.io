@@ -34,8 +34,12 @@ const TOOLS = [
   { value: "text", label: "Text", icon: ALargeSmall },
 ];
 
+const setActiveCursor =()=>{
+  
+}
+
 export default function Toolbar() {
-  const { setTool } = useWhiteBoard();
+  const { setTool } = useWhiteBoard("cursor");
   const { LogOut } = useAuth();
 
 
@@ -60,7 +64,7 @@ export default function Toolbar() {
 
   return (
     
-    <div className="h-16 w-full p-4">
+    <div className="h-16 w-full p-4 z-50">
       <div className="flex justify-between items-center">
         <ToolTipButton label="Menu">
           <Button
@@ -74,7 +78,6 @@ export default function Toolbar() {
         <div className="shadow-md shadow-[#414753] rounded-full p-1 px-3 bg-white border">
           <ToggleGroup
             type="single"
-            
             onValueChange={(val) => val && setTool(val)}
             className="gap-2"
           >

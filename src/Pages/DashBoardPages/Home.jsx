@@ -19,8 +19,19 @@ function HomePage() {
   } = useWhiteBoard();
 
   const stageref = useRef(null);
-  const ActiveToolCofig = Tools_config[Tool]
+  const ActiveTool = Tools_config[Tool]
 
+  const cursorMap = {
+  pen: "crosshair",
+  square: "crosshair",
+  diamond: "crosshair",
+  circle: "crosshair",
+  arrow: "crosshair",
+  line: "crosshair",
+  eraser: "cell",
+  text: "text",
+  cursor: "default",
+};
 
   const handleMouseDown = (e) => {
     if (Tool !== "pen" && Tool !== "eraser") return;
@@ -65,8 +76,8 @@ function HomePage() {
   return (
     <>
     { 
-      ActiveToolCofig && (ActiveToolCofig.hasStroke || ActiveToolCofig.hasColor) && (
-        <UtilsTab config={ActiveToolCofig}/>  
+      ActiveTool && (ActiveTool.hasStroke || ActiveTool.hasColor) && (
+        <UtilsTab config={ActiveTool}/>  
       )
     }
       <div className="h-screen w-screen overflow-hidden">
@@ -79,6 +90,7 @@ function HomePage() {
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
+          style={{cursor:cursorMap[Tool]|| "default"}}
           ref={stageref}
         >
           <Layer>
@@ -89,6 +101,7 @@ function HomePage() {
                   points={el.Pointers}
                   stroke={el.Stroke}
                   strokeWidth={el.StrokeWidth}
+
                   tension={0.4}
                   lineCap="round"
                   lineJoin="round"

@@ -11,3 +11,4 @@
     cursor:{hasStroke:false,hasColor:false},   
   
 }
+
