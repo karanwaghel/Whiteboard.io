@@ -66,3 +66,25 @@
     @apply bg-background text-foreground;
   }
 }
+
+.react-colorful {
+  width: 170px !important;
+  height: 150px !important;
+  border-radius: 8px !important;
+}
+
+.react-colorful__saturation {
+  border-radius: 6px 6px 0 0 !important;
+  height: 100px !important;
+}
+
+.react-colorful__hue {
+  height: 18px !important;
+  border-radius: 0 0 6px 6px !important;
+  margin-top: 4px !important;
+}
+
+.react-colorful__pointer {
+  width: 14px !important;
+  height: 14px !important;
+}

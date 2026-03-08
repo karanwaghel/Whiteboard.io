@@ -49,8 +49,7 @@ function HomePage() {
     pen: (el) => (
       <Line
         points={el.Points}
-        fill={el.Color}
-        stroke={el.backgroundColor}
+        stroke={el.Color}
         strokeWidth={el.StrokeWidth}
         lineCap="round"
         lineJoin="round"
@@ -63,12 +62,12 @@ function HomePage() {
         y={0}
         width={el.width}
         height={el.height}
-        stroke={el.backgroundColor}
+        stroke={el.Color}
         strokeWidth={el.StrokeWidth}
         fillEnabled={true}
-        fill={el.Color}
+        fill={el.backgroundColor}
         fillAfterStrokeEnabled={true}
-        cornerRadius={12}
+        cornerRadius={22}
       />
     ),
     circle: (el) => (
@@ -76,22 +75,22 @@ function HomePage() {
         x={0}
         y={0}
         radius={Math.abs(el.width / 2)}
-        stroke={el.backgroundColor}
+        stroke={el.Color}
         strokeWidth={el.StrokeWidth}
         fillEnabled={true}
-        fill={el.Color}
+        fill={el.backgroundColor}
         fillAfterStrokeEnabled={true}
       />
     ),
     arrow: (el) => (
       <Arrow
         points={el.Points}
-        fill={el.Color}
+        stroke={el.Color}
         strokeWidth={el.StrokeWidth}
       />
     ),
     line: (el) => (
-      <Line points={el.Points} fill={el.Color} strokeWidth={el.StrokeWidth} />
+      <Line points={el.Points} stroke={el.Color} strokeWidth={el.StrokeWidth} />
     ),
     text: (el) => (
       <Text
