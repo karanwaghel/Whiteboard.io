@@ -7,8 +7,11 @@ export const useWhiteBoard = () => {
 const WhiteboardContext = createContext();
 
 const WhiteBoardContextProvider = ({ children }) => {
-  const [Tool, setTool] = useState("");
+  const [Tool, setTool] = useState("cursor");
   const [Color, setColor] = useState("#000000");
+  const [StrokeWidth, setStrokeWidth] = useState(5);
+  const [height, setheight] = useState(50);
+  const [width, setwidth] = useState(50);
   const [isDrawing, setisDrawing] = useState(false);
   const [Elements, setElements] = useState([]);
 
@@ -21,6 +24,12 @@ const WhiteBoardContextProvider = ({ children }) => {
     setColor,
     isDrawing,
     setisDrawing,
+    StrokeWidth,
+    setStrokeWidth,
+    height,
+    setheight,
+    width,
+    setwidth,
   };
   return (
     <>

@@ -28,18 +28,14 @@ const TOOLS = [
   { value: "eraser", label: "Eraser", icon: EraserIcon },
   { value: "square", label: "Square", icon: Square },
   { value: "circle", label: "Circle", icon: Circle },
-  { value: "diamond", label: "Diamond", icon: Diamond },
   { value: "arrow", label: "Arrow", icon: MoveRight },
   { value: "line", label: "Line", icon: Minus },
   { value: "text", label: "Text", icon: ALargeSmall },
 ];
 
-const setActiveCursor =()=>{
-  
-}
 
 export default function Toolbar() {
-  const { setTool } = useWhiteBoard("cursor");
+  const { setTool,Tool} = useWhiteBoard();
   const { LogOut } = useAuth();
 
 
@@ -64,22 +60,24 @@ export default function Toolbar() {
 
   return (
     
-    <div className="h-16 w-full p-4 z-50">
+    <div className="h-16 w-full p-4 z-9999">
       <div className="flex justify-between items-center">
         <ToolTipButton label="Menu">
           <Button
             variant="ghost"
-            className="rounded-full w-10 h-10 p-0 shadow-md shadow-[#414753]"
+            className="rounded-full w-10 h-10  shadow-md shadow-[#414753]"
           >
             <Menu size={20} />
           </Button>
         </ToolTipButton>
 
-        <div className="shadow-md shadow-[#414753] rounded-full p-1 px-3 bg-white border">
+        <div className="shadow-md shadow-[#414753] rounded-full p-1 px-6 bg-white border">
           <ToggleGroup
             type="single"
+            value={Tool}
             onValueChange={(val) => val && setTool(val)}
             className="gap-2"
+            defaultValue="cursor"
           >
             {TOOLS.map((tool,index) => (
               <ToggleGroupItem value={tool.value} className={itemClasses} key={index}>
