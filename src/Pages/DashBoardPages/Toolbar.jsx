@@ -60,18 +60,18 @@ export default function Toolbar() {
 
   return (
     
-    <div className="h-16 w-full p-4 z-9999">
+    <div className="h-16 w-full p-4 absolute top-0 left-0 ">
       <div className="flex justify-between items-center">
         <ToolTipButton label="Menu">
           <Button
             variant="ghost"
-            className="rounded-full w-10 h-10  shadow-md shadow-[#414753]"
+            className="rounded-full w-10 h-10  shadow-md shadow-[#414753] z-50"
           >
             <Menu size={20} />
           </Button>
         </ToolTipButton>
 
-        <div className="shadow-md shadow-[#414753] rounded-full p-1 px-6 bg-white border">
+        <div className="shadow-md shadow-[#414753] rounded-full p-1 px-6 bg-white border z-50">
           <ToggleGroup
             type="single"
             value={Tool}
@@ -94,7 +94,7 @@ export default function Toolbar() {
           </ToggleGroup>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 z-50">
           <ToolTipButton label="Share Board">
             <Button
               variant="outline"

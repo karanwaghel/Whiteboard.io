@@ -14,6 +14,7 @@ const WhiteBoardContextProvider = ({ children }) => {
   const [width, setwidth] = useState(50);
   const [isDrawing, setisDrawing] = useState(false);
   const [Elements, setElements] = useState([]);
+  const [EditingText, setEditingText] = useState(null);
 
   const value = {
     Tool,
@@ -30,6 +31,8 @@ const WhiteBoardContextProvider = ({ children }) => {
     setheight,
     width,
     setwidth,
+    EditingText,
+    setEditingText,
   };
   return (
     <>
