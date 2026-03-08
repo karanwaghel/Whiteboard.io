@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, use, useContext, useState } from "react";
 
 export const useWhiteBoard = () => {
   return useContext(WhiteboardContext);
@@ -15,6 +15,7 @@ const WhiteBoardContextProvider = ({ children }) => {
   const [isDrawing, setisDrawing] = useState(false);
   const [Elements, setElements] = useState([]);
   const [EditingText, setEditingText] = useState(null);
+  const [backgroundColor, setbackgroundColor] = useState("#ffec99");
 
   const value = {
     Tool,
@@ -33,6 +34,8 @@ const WhiteBoardContextProvider = ({ children }) => {
     setwidth,
     EditingText,
     setEditingText,
+    setbackgroundColor,
+    backgroundColor,
   };
   return (
     <>

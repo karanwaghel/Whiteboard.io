@@ -27,6 +27,7 @@ function HomePage() {
     StrokeWidth,
     EditingText,
     setEditingText,
+    backgroundColor,
   } = useWhiteBoard();
 
   const stageref = useRef(null);
@@ -48,7 +49,8 @@ function HomePage() {
     pen: (el) => (
       <Line
         points={el.Points}
-        stroke={el.Color}
+        fill={el.Color}
+        stroke={el.backgroundColor}
         strokeWidth={el.StrokeWidth}
         lineCap="round"
         lineJoin="round"
@@ -61,7 +63,7 @@ function HomePage() {
         y={0}
         width={el.width}
         height={el.height}
-        stroke={el.Color}
+        stroke={el.backgroundColor}
         strokeWidth={el.StrokeWidth}
         fillEnabled={true}
         fill={el.Color}
@@ -74,7 +76,7 @@ function HomePage() {
         x={0}
         y={0}
         radius={Math.abs(el.width / 2)}
-        stroke={el.Color}
+        stroke={el.backgroundColor}
         strokeWidth={el.StrokeWidth}
         fillEnabled={true}
         fill={el.Color}
@@ -84,12 +86,12 @@ function HomePage() {
     arrow: (el) => (
       <Arrow
         points={el.Points}
-        stroke={el.Color}
+        fill={el.Color}
         strokeWidth={el.StrokeWidth}
       />
     ),
     line: (el) => (
-      <Line points={el.Points} stroke={el.Color} strokeWidth={el.StrokeWidth} />
+      <Line points={el.Points} fill={el.Color} strokeWidth={el.StrokeWidth} />
     ),
     text: (el) => (
       <Text
@@ -119,6 +121,7 @@ function HomePage() {
           Points: [pos.x, pos.y],
           Color: Tool === "eraser" ? "#000000" : Color,
           StrokeWidth: Tool === "eraser" ? 20 : StrokeWidth,
+          backgroundColor:backgroundColor
         },
       ]);
     } else {
@@ -135,6 +138,7 @@ function HomePage() {
             height: 0,
             Points: [pos.x, pos.y, pos.x, pos.y],
             Color,
+            backgroundColor:backgroundColor,
             StrokeWidth,
             text: "",
           },

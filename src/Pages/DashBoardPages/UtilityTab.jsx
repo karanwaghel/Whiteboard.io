@@ -13,47 +13,83 @@ const colorButtonStyle = `
 
 function UtilsTab() {
   const [showPicker, setshowpicker] = useState(false);
-  const { Color, setColor, Tool } = useWhiteBoard();
+  const { Color, setColor, Tool,backgroundColor, setbackgroundColor} = useWhiteBoard();
 
   return (
     <>
-        <div className=" mt-2 absolute top-[15%] left-4 w-44 h-60 transition-all duration-500 z-50 " style={{display:Tool === "eraser" ? "none":null}}>
-          <div className="shadow-md shadow-black rounded-md p-2 flex items-start justify-start w-full h-full">
-            <div className="w-full">
-              <label className="text-[14px] w-full block">Stroke</label>
-              <div className="flex items-center">
-                <button
-                  className={colorButtonStyle}
-                  style={{ backgroundColor: "red" }}
-                  onClick={() => setColor("red")}
-                />
-                <button
-                  className={colorButtonStyle}
-                  style={{ backgroundColor: "blue" }}
-                  onClick={() => setColor("blue")}
-                />
-                <button
-                  className={colorButtonStyle}
-                  style={{ backgroundColor: "green" }}
-                  onClick={() => setColor("green")}
-                />
-                <Separator
-                  orientation="vertical"
-                  className="h-6 mx-2 bg-gray-400 mr-4"
-                />
-                <button
-                  className={colorButtonStyle}
-                  onClick={() => setshowpicker((prev) => !prev)}
-                  style={{ backgroundColor: Color }}
-                />
-              </div>
+      <div
+        className="absolute top-[15%] left-4 w-44 h-60 transition-all duration-500 z-50"
+        style={{ display: Tool === "eraser" ? "none" : null }}
+      >
+        <div className="shadow-md shadow-black rounded-md p-2 flex flex-col items-start justify-start w-full h-full">
+          {/* {Color} */}
+          <div className="w-full ">
+            <label className="text-[12px] w-full block">Stroke</label>
+            <div className="flex items-center">
+              <button
+                className={colorButtonStyle}
+                style={{ backgroundColor: "red" }}
+                onClick={() => setColor("red")}
+              />
+              <button
+                className={colorButtonStyle}
+                style={{ backgroundColor: "blue" }}
+                onClick={() => setColor("blue")}
+              />
+              <button
+                className={colorButtonStyle}
+                style={{ backgroundColor: "green" }}
+                onClick={() => setColor("green")}
+              />
+              <Separator
+                orientation="vertical"
+                className="h-6 mx-2 bg-gray-400 mr-4"
+              />
+              <button
+                className={colorButtonStyle}
+                onClick={() => setshowpicker((prev) => !prev)}
+                style={{ backgroundColor: Color }}
+              />
             </div>
           </div>
+          {/* {backgroundColor} */}
+          <div>
+           <div className="w-full">
+            <label className="text-[12px] w-full block">Background</label>
+            <div className="flex items-center">
+              <button
+                className={colorButtonStyle}
+                style={{ backgroundColor: "#db8383" }}
+                onClick={() => setbackgroundColor("#db8383")}
+              />
+              <button
+                className={colorButtonStyle}
+                style={{ backgroundColor: "#7d60f2" }}
+                onClick={() => setbackgroundColor("#7d60f2")}
+              />
+              <button
+                className={colorButtonStyle}
+                style={{ backgroundColor: "#a1edaa" }}
+                onClick={() => setbackgroundColor("#a1edaa")}
+              />
+              <Separator
+                orientation="vertical"
+                className="h-6 mx-2 bg-gray-400 mr-4"
+              />
+              <button
+                className={colorButtonStyle}
+                onClick={''}
+                style={{ backgroundColor: backgroundColor }}
+              />
+            </div>
+          </div>
+          </div>
         </div>
+      </div>
 
       {showPicker && (
         <div className="absolute z-10 top-32 left-52">
-          <HexColorPicker color={Color} onChange={setColor} />
+          <HexColorPicker color={Color} onChange={setColor}  />
         </div>
       )}
     </>
