@@ -2,9 +2,8 @@ import {
   Pen,
   EraserIcon,
   Menu,
-  Share2,
   Square,
-  Diamond,
+  Trash2Icon,
   Circle,
   MoveRight,
   Minus,
@@ -14,6 +13,16 @@ import {
 } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+  DialogTrigger,
+  DialogContent,
+} from "@/components/ui/dialog";
+import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
@@ -21,6 +30,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useWhiteBoard } from "@/ComponentProject/Context/DashBoardContext";
 import { useAuth } from "@/ComponentProject/Context/AuthContext";
+import { Separator } from "@/components/ui/separator";
 
 const TOOLS = [
   { value: "cursor", label: "Selection", icon: MousePointer },
@@ -33,12 +43,9 @@ const TOOLS = [
   { value: "text", label: "Text", icon: ALargeSmall },
 ];
 
-
 export default function Toolbar() {
-  const { setTool,Tool} = useWhiteBoard();
+  const { setTool, Tool, setElements,selectedIndex} = useWhiteBoard();
   const { LogOut } = useAuth();
-
-
 
   const ToolTipButton = ({ children, label }) => (
     <Tooltip>
@@ -47,10 +54,13 @@ export default function Toolbar() {
     </Tooltip>
   );
 
+  const ResetCanvas = () => {
+    setElements([]);
+  };
+
   const itemClasses = `
     w-10 h-10 rounded-xl transition-all duration-200
     border-2 border-transparent
-
     hover:bg-[#b5d6fc]
     data-[state=on]:bg-[#85baf7]
     data-[state=on]:border-2
@@ -59,19 +69,18 @@ export default function Toolbar() {
   `;
 
   return (
-    
-    <div className="h-16 w-full p-4 absolute top-0 left-0 ">
+    <div className="h-16 w-full p-2 absolute top-0 left-0 ">
       <div className="flex justify-between items-center">
         <ToolTipButton label="Menu">
           <Button
             variant="ghost"
-            className="rounded-full w-10 h-10  shadow-md shadow-[#414753] z-50"
+            className="rounded-2xl w-10 h-10  shadow-md shadow-[#414753] z-50"
           >
             <Menu size={20} />
           </Button>
         </ToolTipButton>
 
-        <div className="shadow-md shadow-[#414753] rounded-full p-1 px-6 bg-white border z-50">
+        <div className="shadow-md shadow-[#414753] rounded-full p-1 px-6 mt-2 bg-white border z-50">
           <ToggleGroup
             type="single"
             value={Tool}
@@ -79,8 +88,12 @@ export default function Toolbar() {
             className="gap-2"
             defaultValue="cursor"
           >
-            {TOOLS.map((tool,index) => (
-              <ToggleGroupItem value={tool.value} className={itemClasses} key={index}>
+            {TOOLS.map((tool, index) => (
+              <ToggleGroupItem
+                value={tool.value}
+                className={itemClasses}
+                key={index}
+              >
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="flex items-center justify-center w-full h-full">
@@ -95,19 +108,45 @@ export default function Toolbar() {
         </div>
 
         <div className="flex gap-2 z-50">
-          <ToolTipButton label="Share Board">
-            <Button
-              variant="outline"
-              className="rounded-full w-10 h-10 shadow-md shadow-[#414753]"
-            >
-              <Share2 size={18} />
-            </Button>
-          </ToolTipButton>
+          <Dialog>
+            <ToolTipButton label="Reset Canvas">
+              <DialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  className="rounded-2xl w-10 h-10 shadow-md shadow-[#414753]"
+                >
+                  <Trash2Icon size={18} />
+                </Button>
+              </DialogTrigger>
+            </ToolTipButton>
+            <DialogContent className="!p-8">
+              <DialogHeader>
+                <DialogTitle className="text-lg">Reset Canvas</DialogTitle>
+                <Separator className="!mt-2 !mb-4"/>
+                <DialogDescription >
+                  Are you sure you want to reset the canvas?
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <DialogClose
+                  asChild
+                >
+                  <Button onClick={ResetCanvas} variant="destructive" className="ml-8">
+                    Reset
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           <ToolTipButton label="LogOut">
             <Button
               onClick={LogOut}
               variant="destructive"
-              className="rounded-full w-10 h-10 p-0 shadow-sm"
+              className="rounded-2xl w-10 h-10 p-0 shadow-sm"
             >
               <LogOutIcon size={18} />
             </Button>

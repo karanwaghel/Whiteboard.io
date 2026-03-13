@@ -28,6 +28,9 @@ function HomePage() {
     EditingText,
     setEditingText,
     backgroundColor,
+    Opacity,
+    FontSize,
+    setSelectedIndex,
   } = useWhiteBoard();
 
   const stageref = useRef(null);
@@ -53,6 +56,7 @@ function HomePage() {
         strokeWidth={el.StrokeWidth}
         lineCap="round"
         lineJoin="round"
+        opacity={el.Opacity}
         globalCompositeOperation="source-over"
       />
     ),
@@ -68,6 +72,7 @@ function HomePage() {
         fill={el.backgroundColor}
         fillAfterStrokeEnabled={true}
         cornerRadius={22}
+        opacity={el.Opacity}
       />
     ),
     circle: (el) => (
@@ -80,6 +85,7 @@ function HomePage() {
         fillEnabled={true}
         fill={el.backgroundColor}
         fillAfterStrokeEnabled={true}
+        opacity={el.Opacity}
       />
     ),
     arrow: (el) => (
@@ -87,10 +93,11 @@ function HomePage() {
         points={el.Points}
         stroke={el.Color}
         strokeWidth={el.StrokeWidth}
+        opacity={el.Opacity}
       />
     ),
     line: (el) => (
-      <Line points={el.Points} stroke={el.Color} strokeWidth={el.StrokeWidth} />
+      <Line points={el.Points} stroke={el.Color} strokeWidth={el.StrokeWidth} opacity={el.Opacity} />
     ),
     text: (el) => (
       <Text
@@ -98,8 +105,9 @@ function HomePage() {
         y={0}
         text={el.text}
         fill={el.Color}
-        fontSize={12}
+        fontSize={el.FontSize}
         fillEnabled={true}
+        opacity={el.Opacity}
         fillAfterStrokeEnabled={true}
       />
     ),
@@ -120,7 +128,8 @@ function HomePage() {
           Points: [pos.x, pos.y],
           Color: Tool === "eraser" ? "#000000" : Color,
           StrokeWidth: Tool === "eraser" ? 20 : StrokeWidth,
-          backgroundColor:backgroundColor
+          backgroundColor:backgroundColor,
+          Opacity:Tool === "eraser" ? 1 : Opacity,
         },
       ]);
     } else {
@@ -134,11 +143,13 @@ function HomePage() {
             x: pos.x,
             y: pos.y,
             width: 0,
-            height: 0,
+            height:0,
             Points: [pos.x, pos.y, pos.x, pos.y],
             Color,
-            backgroundColor:backgroundColor,
+            backgroundColor,
+            Opacity,
             StrokeWidth,
+            FontSize,
             text: "",
           },
         ];
@@ -237,7 +248,7 @@ function HomePage() {
             top: EditingText.y,
             outline: "none",
             color: Color,
-            fontSize:12,
+            fontSize:FontSize,
             zIndex: 100,
             minWidth: "100px",
             background: "transparent",
@@ -268,6 +279,7 @@ function HomePage() {
             width={window.innerWidth}
             height={window.innerHeight}
             fill="white"
+            onClick={()=>setSelectedIndex(null)}
           />
 
           {Elements.map((el, realIndex) => {
@@ -286,6 +298,7 @@ function HomePage() {
             return (
               <Group
                 key={realIndex}
+                onClick={()=>{if(Tool == "cursor") setSelectedIndex(realIndex)}}
                 draggable={Tool === "cursor"}
                 x={el.x || 0}
                 y={el.y || 0}
