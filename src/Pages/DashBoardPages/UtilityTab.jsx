@@ -33,20 +33,23 @@ function UtilsTab() {
   const [showPicker, setshowpicker] = useState(false);
   const [showBgColorPicker, setshowBgColorPicker] = useState(false);
   const {
-    Color, setColor,
+    Color,
+    setColor,
     Tool,
-    backgroundColor, setbackgroundColor,
-    StrokeWidth, setStrokeWidth,
-    Opacity, setOpacity,
+    backgroundColor,
+    setbackgroundColor,
+    StrokeWidth,
+    setStrokeWidth,
+    Opacity,
+    setOpacity,
     selectedIndex,
     setElements,
   } = useWhiteBoard();
 
-
   const patchSelected = (patch) => {
     if (selectedIndex !== null) {
       setElements((prev) =>
-        prev.map((el, i) => i === selectedIndex ? { ...el, ...patch } : el)
+        prev.map((el, i) => (i === selectedIndex ? { ...el, ...patch } : el)),
       );
     }
   };
@@ -75,24 +78,45 @@ function UtilsTab() {
     <>
       <div
         className="absolute top-[15%] left-4 w-44 h-80 transition-all duration-500 z-50"
-        style={{ display: Tool === "eraser" ? "none" : null }}
+        style={{
+          display:
+            Tool === "eraser" || (Tool === "cursor" && selectedIndex === null)
+              ? "none"
+              : null,
+        }}
       >
         <div className="shadow-md shadow-black rounded-md p-2 flex flex-col items-start justify-start w-full h-full">
-          
           {/* Stroke */}
           <div className="w-full mb-1">
             <label className="text-[12px] w-full block">Stroke</label>
             <div className="flex items-center">
-              <button className={colorButtonStyle} style={{ backgroundColor: "red" }}
-                onClick={() => handleColorChange("#ff0000")} />
-              <button className={colorButtonStyle} style={{ backgroundColor: "blue" }}
-                onClick={() => handleColorChange("#0000ff")} />
-              <button className={colorButtonStyle} style={{ backgroundColor: "green" }}
-                onClick={() => handleColorChange("#00ff00")} />
-              <Separator orientation="vertical" className="h-6 mx-2 bg-gray-400 mr-4" />
-              <button className={colorButtonStyle}
-                onClick={() => setshowpicker((prev) => !prev)}
-                style={{ backgroundColor: Color }} />
+              <button
+                className={colorButtonStyle}
+                style={{ backgroundColor: "red" }}
+                onClick={() => handleColorChange("#ff0000")}
+              />
+              <button
+                className={colorButtonStyle}
+                style={{ backgroundColor: "blue" }}
+                onClick={() => handleColorChange("#0000ff")}
+              />
+              <button
+                className={colorButtonStyle}
+                style={{ backgroundColor: "#00ff00" }}
+                onClick={() => handleColorChange("#00ff00")}
+              />
+              <Separator
+                orientation="vertical"
+                className="h-6 mx-2 bg-gray-400 mr-4"
+              />
+              <button
+                className={colorButtonStyle}
+                onClick={() => {
+                  setshowpicker((prev) => !prev);
+                  if (showBgColorPicker) setshowBgColorPicker(false);
+                }}
+                style={{ backgroundColor: Color }}
+              />
             </div>
           </div>
 
@@ -104,16 +128,33 @@ function UtilsTab() {
               <div className="w-full mb-1">
                 <label className="text-[12px] w-full block">Background</label>
                 <div className="flex items-center">
-                  <button className={colorButtonStyle} style={{ backgroundColor: "#db8383" }}
-                    onClick={() => handleBgColorChange("#db8383")} />
-                  <button className={colorButtonStyle} style={{ backgroundColor: "#7d60f2" }}
-                    onClick={() => handleBgColorChange("#7d60f2")} />
-                  <button className={colorButtonStyle} style={{ backgroundColor: "#a1edaa" }}
-                    onClick={() => handleBgColorChange("#a1edaa")} />
-                  <Separator orientation="vertical" className="h-6 mx-2 bg-gray-400 mr-4" />
-                  <button className={colorButtonStyle}
-                    onClick={() => setshowBgColorPicker((prev) => !prev)}
-                    style={{ backgroundColor: backgroundColor }} />
+                  <button
+                    className={colorButtonStyle}
+                    style={{ backgroundColor: "#db8383" }}
+                    onClick={() => handleBgColorChange("#db8383")}
+                  />
+                  <button
+                    className={colorButtonStyle}
+                    style={{ backgroundColor: "#7d60f2" }}
+                    onClick={() => handleBgColorChange("#7d60f2")}
+                  />
+                  <button
+                    className={colorButtonStyle}
+                    style={{ backgroundColor: "#a1edaa" }}
+                    onClick={() => handleBgColorChange("#a1edaa")}
+                  />
+                  <Separator
+                    orientation="vertical"
+                    className="h-6 mx-2 bg-gray-400 mr-4"
+                  />
+                  <button
+                    className={colorButtonStyle}
+                    onClick={() => {
+                      setshowBgColorPicker((prev) => !prev);
+                      if (showPicker) setshowpicker(false);
+                    }}
+                    style={{ backgroundColor: backgroundColor }}
+                  />
                 </div>
               </div>
 
@@ -121,20 +162,36 @@ function UtilsTab() {
               <div className="w-full mb-1">
                 <label className="text-[12px] w-full block">Stroke Width</label>
                 <div className="flex items-center">
-                  <button className={WidthsButtonStyle} onClick={() => handleStrokeWidth(2)}
-                    style={{ background: StrokeWidth === 2 ? "#85baf7" : null }}>
+                  <button
+                    className={WidthsButtonStyle}
+                    onClick={() => handleStrokeWidth(2)}
+                    style={{ background: StrokeWidth === 2 ? "#85baf7" : null }}
+                  >
                     <Minus size={8} />
                   </button>
-                  <button className={WidthsButtonStyle} onClick={() => handleStrokeWidth(8)}
-                    style={{ background: StrokeWidth === 8 ? "#85baf7" : null }}>
+                  <button
+                    className={WidthsButtonStyle}
+                    onClick={() => handleStrokeWidth(8)}
+                    style={{ background: StrokeWidth === 8 ? "#85baf7" : null }}
+                  >
                     <Minus size={14} />
                   </button>
-                  <button className={WidthsButtonStyle} onClick={() => handleStrokeWidth(14)}
-                    style={{ background: StrokeWidth === 14 ? "#85baf7" : null }}>
+                  <button
+                    className={WidthsButtonStyle}
+                    onClick={() => handleStrokeWidth(14)}
+                    style={{
+                      background: StrokeWidth === 14 ? "#85baf7" : null,
+                    }}
+                  >
                     <Minus size={20} />
                   </button>
-                  <button className={WidthsButtonStyle} onClick={() => handleStrokeWidth(22)}
-                    style={{ background: StrokeWidth === 22 ? "#85baf7" : null }}>
+                  <button
+                    className={WidthsButtonStyle}
+                    onClick={() => handleStrokeWidth(22)}
+                    style={{
+                      background: StrokeWidth === 22 ? "#85baf7" : null,
+                    }}
+                  >
                     <Minus size={26} />
                   </button>
                 </div>
@@ -167,7 +224,10 @@ function UtilsTab() {
 
       {showBgColorPicker && (
         <div className="absolute z-10 top-52 left-52 p-4 rounded-2xl rounded-tl-none shadow-md shadow-black">
-          <HexColorPicker color={backgroundColor} onChange={handleBgColorChange} />
+          <HexColorPicker
+            color={backgroundColor}
+            onChange={handleBgColorChange}
+          />
           <HexColorInput
             className="border border-black rounded-md w-[10.5rem] mt-3 p-1"
             color={backgroundColor}

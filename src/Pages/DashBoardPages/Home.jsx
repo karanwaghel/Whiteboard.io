@@ -10,14 +10,16 @@ import {
   Circle,
   Text,
   Arrow,
+  Transformer,
 } from "react-konva";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import UtilsTab from "./UtilityTab";
 import { Tools_config } from "@/ComponentProject/config/ToolsConfig";
 
 function HomePage() {
   const {
     Tool,
+    setColor,
     setTool,
     Elements,
     setElements,
@@ -30,11 +32,17 @@ function HomePage() {
     backgroundColor,
     Opacity,
     FontSize,
+    selectedIndex,
     setSelectedIndex,
+    setStrokeWidth,
+    setOpacity,
+    setbackgroundColor,
   } = useWhiteBoard();
 
   const stageref = useRef(null);
   const newTextIndexRef = useRef(null);
+  const groupRef = useRef({});
+  const transformerRef = useRef(null);
   const ActiveTool = Tools_config[Tool];
 
   const cursorMap = {
@@ -58,6 +66,7 @@ function HomePage() {
         lineJoin="round"
         opacity={el.Opacity}
         globalCompositeOperation="source-over"
+        rotation={el.rotation}
       />
     ),
     square: (el) => (
@@ -73,6 +82,7 @@ function HomePage() {
         fillAfterStrokeEnabled={true}
         cornerRadius={22}
         opacity={el.Opacity}
+        rotation={el.rotation}
       />
     ),
     circle: (el) => (
@@ -86,6 +96,7 @@ function HomePage() {
         fill={el.backgroundColor}
         fillAfterStrokeEnabled={true}
         opacity={el.Opacity}
+        rotation={el.rotation}
       />
     ),
     arrow: (el) => (
@@ -94,10 +105,17 @@ function HomePage() {
         stroke={el.Color}
         strokeWidth={el.StrokeWidth}
         opacity={el.Opacity}
+        rotation={el.rotation}
       />
     ),
     line: (el) => (
-      <Line points={el.Points} stroke={el.Color} strokeWidth={el.StrokeWidth} opacity={el.Opacity} />
+      <Line
+        points={el.Points}
+        stroke={el.Color}
+        strokeWidth={el.StrokeWidth}
+        opacity={el.Opacity}
+        rotation={el.rotation}
+      />
     ),
     text: (el) => (
       <Text
@@ -109,9 +127,26 @@ function HomePage() {
         fillEnabled={true}
         opacity={el.Opacity}
         fillAfterStrokeEnabled={true}
+        rotation={el.rotation}
       />
     ),
   };
+
+  useEffect(() => {
+
+    if(transformerRef.current) return;
+
+    if (selectedIndex !== null && transformerRef.current) {
+      const selectednode = groupRef.current[selectedIndex];
+      if (selectednode) {
+        transformerRef.current.nodes([selectednode]);
+        transformerRef.current.getLayer().batchDraw();
+      }
+    } else {
+      transformerRef.current.nodes([]);
+      transformerRef.current.getLayer().batchDraw();
+    }
+  }, [selectedIndex]);
 
   const handleMouseDown = (e) => {
     if (Tool === "cursor") return;
@@ -128,8 +163,8 @@ function HomePage() {
           Points: [pos.x, pos.y],
           Color: Tool === "eraser" ? "#000000" : Color,
           StrokeWidth: Tool === "eraser" ? 20 : StrokeWidth,
-          backgroundColor:backgroundColor,
-          Opacity:Tool === "eraser" ? 1 : Opacity,
+          backgroundColor: backgroundColor,
+          Opacity: Tool === "eraser" ? 1 : Opacity,
         },
       ]);
     } else {
@@ -143,7 +178,7 @@ function HomePage() {
             x: pos.x,
             y: pos.y,
             width: 0,
-            height:0,
+            height: 0,
             Points: [pos.x, pos.y, pos.x, pos.y],
             Color,
             backgroundColor,
@@ -161,7 +196,7 @@ function HomePage() {
             text: "",
             x: pos.x,
             y: pos.y,
-            index:newTextIndexRef.current,
+            index: newTextIndexRef.current,
           });
         }, 0);
       }
@@ -213,9 +248,10 @@ function HomePage() {
         <Toolbar />
       </TooltipProvider>
 
-      {ActiveTool && (ActiveTool.hasStroke || ActiveTool.hasColor) && (
+      {(ActiveTool && (ActiveTool.hasStroke || ActiveTool.hasColor)) ||
+      selectedIndex !== null ? (
         <UtilsTab config={ActiveTool} />
-      )}
+      ) : null}
 
       {EditingText && (
         <input
@@ -248,7 +284,7 @@ function HomePage() {
             top: EditingText.y,
             outline: "none",
             color: Color,
-            fontSize:FontSize,
+            fontSize: FontSize,
             zIndex: 100,
             minWidth: "100px",
             background: "transparent",
@@ -279,7 +315,7 @@ function HomePage() {
             width={window.innerWidth}
             height={window.innerHeight}
             fill="white"
-            onClick={()=>setSelectedIndex(null)}
+            onClick={() => setSelectedIndex(null)}
           />
 
           {Elements.map((el, realIndex) => {
@@ -298,7 +334,18 @@ function HomePage() {
             return (
               <Group
                 key={realIndex}
-                onClick={()=>{if(Tool == "cursor") setSelectedIndex(realIndex)}}
+                ref={(node) => {
+                  groupRef.current[realIndex] = node;
+                }}
+                onClick={() => {
+                  if (Tool === "cursor") {
+                    setSelectedIndex(realIndex);
+                    setColor(el.Color);
+                    setbackgroundColor(el.backgroundColor);
+                    setOpacity(el.Opacity);
+                    setStrokeWidth(el.StrokeWidth);
+                  }
+                }}
                 draggable={Tool === "cursor"}
                 x={el.x || 0}
                 y={el.y || 0}
@@ -315,6 +362,39 @@ function HomePage() {
               </Group>
             );
           })}
+
+          {/* {transformer} */}
+          <Transformer
+            ref={transformerRef}
+            borderStroke="#4A90E2"
+            borderStrokeWidth={2}
+            anchorStroke="#4A90E2"
+            anchorFill="white"
+            anchorSize={8}
+            anchorCornerRadius={2}
+            rotateEnabled={true}
+            onTransformEnd={(e) => {
+              const node = groupRef.current[selectedIndex];
+              const scaleX = node.scaleX();
+              const scaleY = node.scaleY();
+              node.scaleX(1);
+              node.scaleY(1);
+              setElements((prev) =>
+                prev.map((el, index) =>
+                  index === selectedIndex
+                    ? {
+                        ...el,
+                        x: node.x(),
+                        y: node.y(),
+                        width: Math.max(el.width * scaleX),
+                        height: Math.max(el.height * scaleY),
+                        rotation: node.rotation(),
+                      }
+                    : el,
+                ),
+              );
+            }}
+          />
         </Layer>
       </Stage>
     </div>
