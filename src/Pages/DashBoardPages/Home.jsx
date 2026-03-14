@@ -66,7 +66,6 @@ function HomePage() {
         lineJoin="round"
         opacity={el.Opacity}
         globalCompositeOperation="source-over"
-        rotation={el.rotation}
       />
     ),
     square: (el) => (
@@ -82,7 +81,6 @@ function HomePage() {
         fillAfterStrokeEnabled={true}
         cornerRadius={22}
         opacity={el.Opacity}
-        rotation={el.rotation}
       />
     ),
     circle: (el) => (
@@ -96,7 +94,6 @@ function HomePage() {
         fill={el.backgroundColor}
         fillAfterStrokeEnabled={true}
         opacity={el.Opacity}
-        rotation={el.rotation}
       />
     ),
     arrow: (el) => (
@@ -105,7 +102,6 @@ function HomePage() {
         stroke={el.Color}
         strokeWidth={el.StrokeWidth}
         opacity={el.Opacity}
-        rotation={el.rotation}
       />
     ),
     line: (el) => (
@@ -114,7 +110,6 @@ function HomePage() {
         stroke={el.Color}
         strokeWidth={el.StrokeWidth}
         opacity={el.Opacity}
-        rotation={el.rotation}
       />
     ),
     text: (el) => (
@@ -127,26 +122,34 @@ function HomePage() {
         fillEnabled={true}
         opacity={el.Opacity}
         fillAfterStrokeEnabled={true}
-        rotation={el.rotation}
       />
     ),
   };
 
   useEffect(() => {
+  if (!transformerRef.current) return;
 
-    if(transformerRef.current) return;
+  const pointBasedTools = ["pen", "arrow", "line"];
 
-    if (selectedIndex !== null && transformerRef.current) {
-      const selectednode = groupRef.current[selectedIndex];
-      if (selectednode) {
-        transformerRef.current.nodes([selectednode]);
-        transformerRef.current.getLayer().batchDraw();
-      }
-    } else {
+  if (selectedIndex !== null) {
+    const selectedEl = Elements[selectedIndex];
+    
+    if (selectedEl && pointBasedTools.includes(selectedEl.Tool)) {
       transformerRef.current.nodes([]);
-      transformerRef.current.getLayer().batchDraw();
+      transformerRef.current.getLayer()?.batchDraw();
+      return;
     }
-  }, [selectedIndex]);
+
+    const selectedNode = groupRef.current[selectedIndex];
+    if (selectedNode) {
+      transformerRef.current.nodes([selectedNode]);
+      transformerRef.current.getLayer()?.batchDraw();
+    }
+  } else {
+    transformerRef.current.nodes([]);
+    transformerRef.current.getLayer()?.batchDraw();
+  }
+}, [selectedIndex, Elements]);
 
   const handleMouseDown = (e) => {
     if (Tool === "cursor") return;
@@ -248,8 +251,7 @@ function HomePage() {
         <Toolbar />
       </TooltipProvider>
 
-      {(ActiveTool && (ActiveTool.hasStroke || ActiveTool.hasColor)) ||
-      selectedIndex !== null ? (
+      {(Tool !== "cursor" && Tool !== "eraser") || selectedIndex !== null ? (
         <UtilsTab config={ActiveTool} />
       ) : null}
 
@@ -347,13 +349,31 @@ function HomePage() {
                   }
                 }}
                 draggable={Tool === "cursor"}
-                x={el.x || 0}
-                y={el.y || 0}
+                x={
+                  ["pen", "arrow", "line"].includes(el.Tool)
+                    ? 0
+                    : (el.x || 0) + (el.width || 0) / 2
+                }
+                y={
+                  ["pen", "arrow", "line"].includes(el.Tool)
+                    ? 0
+                    : (el.y || 0) + (el.height || 0) / 2
+                }
+                offsetX={(el.width || 0) / 2}
+                offsetY={(el.height || 0) / 2}
+                rotation={el.rotation || 0}
                 onDragEnd={(e) => {
-                  const { x, y } = e.target.position();
+                  const node = e.target;
                   setElements((prev) =>
                     prev.map((Item, index) =>
-                      index === realIndex ? { ...Item, x, y } : Item,
+                      index === realIndex
+                        ? {
+                            ...Item,
+                            x: node.x() - (Item.width || 0) / 2,
+                            y: node.y() - (Item.height || 0) / 2,
+                            rotation: node.rotation(),
+                          }
+                        : Item,
                     ),
                   );
                 }}
@@ -364,37 +384,56 @@ function HomePage() {
           })}
 
           {/* {transformer} */}
-          <Transformer
-            ref={transformerRef}
-            borderStroke="#4A90E2"
-            borderStrokeWidth={2}
-            anchorStroke="#4A90E2"
-            anchorFill="white"
-            anchorSize={8}
-            anchorCornerRadius={2}
-            rotateEnabled={true}
-            onTransformEnd={(e) => {
-              const node = groupRef.current[selectedIndex];
-              const scaleX = node.scaleX();
-              const scaleY = node.scaleY();
-              node.scaleX(1);
-              node.scaleY(1);
-              setElements((prev) =>
-                prev.map((el, index) =>
-                  index === selectedIndex
-                    ? {
-                        ...el,
-                        x: node.x(),
-                        y: node.y(),
-                        width: Math.max(el.width * scaleX),
-                        height: Math.max(el.height * scaleY),
-                        rotation: node.rotation(),
-                      }
-                    : el,
-                ),
-              );
-            }}
-          />
+
+          {Tool !== "eraser" && (
+            <Transformer
+              ref={transformerRef}
+              borderStroke="#4A90E2"
+              borderStrokeWidth={1}
+              anchorStroke="#4A90E2"
+              anchorFill="white"
+              anchorSize={8}
+              anchorCornerRadius={5}
+              rotateEnabled={true}
+              onTransformEnd={(e) => {
+                const node = groupRef.current[selectedIndex];
+                const scaleX = node.scaleX();
+                const scaleY = node.scaleY();
+                const rotation = node.rotation();
+
+                node.scaleX(1);
+                node.scaleY(1);
+
+                setElements((prev) =>
+                  prev.map((el, index) => {
+                    if (index !== selectedIndex) return el;
+
+                    const newWidth = el.width * scaleX;
+                    const newHeight = el.height * scaleY;
+
+                    const updatedPoints =
+                      el.Points && ["arrow", "line", "pen"].includes(el.Tool)
+                        ? el.Points.map((p, i) =>
+                            i % 2 === 0 ? p * scaleX : p * scaleY,
+                          )
+                        : el.Points;
+
+                    return {
+                      ...el,
+                      x: node.x() - newWidth / 2,
+                      y: node.y() - newHeight / 2,
+                      width: newWidth,
+                      height: newHeight,
+                      offsetX: newWidth / 2,
+                      offsetY: newHeight / 2,
+                      rotation,
+                      Points: updatedPoints,
+                    };
+                  }),
+                );
+              }}
+            />
+          )}
         </Layer>
       </Stage>
     </div>

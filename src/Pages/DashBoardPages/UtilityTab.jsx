@@ -78,12 +78,6 @@ function UtilsTab() {
     <>
       <div
         className="absolute top-[15%] left-4 w-44 h-80 transition-all duration-500 z-50"
-        style={{
-          display:
-            Tool === "eraser" || (Tool === "cursor" && selectedIndex === null)
-              ? "none"
-              : null,
-        }}
       >
         <div className="shadow-md shadow-black rounded-md p-2 flex flex-col items-start justify-start w-full h-full">
           {/* Stroke */}
