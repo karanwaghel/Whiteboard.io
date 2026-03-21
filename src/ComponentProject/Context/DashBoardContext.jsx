@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { set } from "zod";
 
 export const useWhiteBoard = () => {
   return useContext(WhiteboardContext);
@@ -19,6 +20,8 @@ const WhiteBoardContextProvider = ({ children }) => {
   const [Opacity, setOpacity] = useState(1);
   const [FontSize, setFontSize] = useState(10);
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [ToggleTextutils, setToggleTextutils] = useState(false);
+  const [Edges, setEdges] = useState(22);
   const value = {
     Tool,
     setTool,
@@ -44,6 +47,9 @@ const WhiteBoardContextProvider = ({ children }) => {
     setFontSize,
     selectedIndex,
     setSelectedIndex,
+    ToggleTextutils,
+    setToggleTextutils,
+    Edges,setEdges
   };
   return (
     <>

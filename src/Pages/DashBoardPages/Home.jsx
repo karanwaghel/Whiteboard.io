@@ -32,11 +32,14 @@ function HomePage() {
     backgroundColor,
     Opacity,
     FontSize,
+    setFontSize,
     selectedIndex,
     setSelectedIndex,
     setStrokeWidth,
     setOpacity,
     setbackgroundColor,
+    setToggleTextutils,
+    Edges,
   } = useWhiteBoard();
 
   const stageref = useRef(null);
@@ -44,6 +47,7 @@ function HomePage() {
   const groupRef = useRef({});
   const transformerRef = useRef(null);
   const ActiveTool = Tools_config[Tool];
+  const ElementsRef = useRef(Elements);
 
   const cursorMap = {
     pen: "crosshair",
@@ -79,7 +83,7 @@ function HomePage() {
         fillEnabled={true}
         fill={el.backgroundColor}
         fillAfterStrokeEnabled={true}
-        cornerRadius={22}
+        cornerRadius={el.edges}
         opacity={el.Opacity}
       />
     ),
@@ -127,29 +131,33 @@ function HomePage() {
   };
 
   useEffect(() => {
-  if (!transformerRef.current) return;
+    ElementsRef.current = Elements;
+  }, [Elements]);
 
-  const pointBasedTools = ["pen", "arrow", "line"];
+  useEffect(() => {
+    if (!transformerRef.current) return;
 
-  if (selectedIndex !== null) {
-    const selectedEl = Elements[selectedIndex];
-    
-    if (selectedEl && pointBasedTools.includes(selectedEl.Tool)) {
+    const pointBasedTools = ["pen", "arrow", "line"];
+
+    if (selectedIndex !== null) {
+      const selectedEl = Elements.current[selectedIndex];
+
+      if (selectedEl && pointBasedTools.includes(selectedEl.Tool)) {
+        transformerRef.current.nodes([]);
+        transformerRef.current.getLayer()?.batchDraw();
+        return;
+      }
+
+      const selectedNode = groupRef.current[selectedIndex];
+      if (selectedNode) {
+        transformerRef.current.nodes([selectedNode]);
+        transformerRef.current.getLayer()?.batchDraw();
+      }
+    } else {
       transformerRef.current.nodes([]);
       transformerRef.current.getLayer()?.batchDraw();
-      return;
     }
-
-    const selectedNode = groupRef.current[selectedIndex];
-    if (selectedNode) {
-      transformerRef.current.nodes([selectedNode]);
-      transformerRef.current.getLayer()?.batchDraw();
-    }
-  } else {
-    transformerRef.current.nodes([]);
-    transformerRef.current.getLayer()?.batchDraw();
-  }
-}, [selectedIndex, Elements]);
+  }, [selectedIndex]);
 
   const handleMouseDown = (e) => {
     if (Tool === "cursor") return;
@@ -165,7 +173,7 @@ function HomePage() {
           Tool,
           Points: [pos.x, pos.y],
           Color: Tool === "eraser" ? "#000000" : Color,
-          StrokeWidth: Tool === "eraser" ? 20 : StrokeWidth,
+          StrokeWidth: Tool === "eraser" ? 30 : StrokeWidth,
           backgroundColor: backgroundColor,
           Opacity: Tool === "eraser" ? 1 : Opacity,
         },
@@ -189,6 +197,7 @@ function HomePage() {
             StrokeWidth,
             FontSize,
             text: "",
+            edges: Edges,
           },
         ];
       });
@@ -341,7 +350,13 @@ function HomePage() {
                 }}
                 onClick={() => {
                   if (Tool === "cursor") {
+                    if (el.Tool === "text") {
+                      setToggleTextutils(true);
+                    } else {
+                      setToggleTextutils(false);
+                    }
                     setSelectedIndex(realIndex);
+                    setFontSize(el.FontSize);
                     setColor(el.Color);
                     setbackgroundColor(el.backgroundColor);
                     setOpacity(el.Opacity);

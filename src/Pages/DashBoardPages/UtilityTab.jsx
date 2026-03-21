@@ -2,7 +2,7 @@ import { useWhiteBoard } from "@/ComponentProject/Context/DashBoardContext";
 import { useState } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { Separator } from "@/components/ui/separator";
-import { Minus } from "lucide-react";
+import { Minus, SquareRoundCorner, Square } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import FontButtons from "./UtilsButtons/FontButtons";
 
@@ -44,6 +44,9 @@ function UtilsTab() {
     setOpacity,
     selectedIndex,
     setElements,
+    ToggleTextutils,
+    Edges,
+    setEdges,
   } = useWhiteBoard();
 
   const patchSelected = (patch) => {
@@ -74,31 +77,51 @@ function UtilsTab() {
     patchSelected({ StrokeWidth: width });
   };
 
+  const handleEdgesChange = (Edges) => {
+    setEdges(Edges);
+    patchSelected({ Edges: Edges });
+  };
+
+  const StrokeButtomMap = [
+    { value: "#ff0000", bgColor: "#ff0000" },
+    { value: "#00ff00", bgColor: "#00ff00" },
+    { value: "#0000ff", bgColor: "#0000ff" },
+  ];
+
+  const BackGroundButtomMap = [
+    { value: "#db8383", bgColor: "#db8383" },
+    { value: "#7d60f2", bgColor: "#7d60f2" },
+    { value: "#a1edaa", bgColor: "#a1edaa" },
+  ];
+
+  const StrokeWidthButtomMap = [
+    { value: 2, iconSize: 8 },
+    { value: 8, iconSize: 14 },
+    { value: 14, iconSize: 20 },
+    { value: 22, iconSize: 26 },
+  ];
+
+  const EdgesButtonMap = [
+    { value: 0, icon: Square },
+    { value: 22, icon: SquareRoundCorner },
+  ];
+
   return (
     <>
-      <div
-        className="absolute top-[15%] left-4 w-44 h-80 transition-all duration-500 z-50"
-      >
+      <div className="absolute top-[15%] left-4 w-44 h-80 transition-all duration-500 z-50">
         <div className="shadow-md shadow-black rounded-md p-2 flex flex-col items-start justify-start w-full h-full">
           {/* Stroke */}
           <div className="w-full mb-1">
             <label className="text-[12px] w-full block">Stroke</label>
             <div className="flex items-center">
-              <button
-                className={colorButtonStyle}
-                style={{ backgroundColor: "red" }}
-                onClick={() => handleColorChange("#ff0000")}
-              />
-              <button
-                className={colorButtonStyle}
-                style={{ backgroundColor: "blue" }}
-                onClick={() => handleColorChange("#0000ff")}
-              />
-              <button
-                className={colorButtonStyle}
-                style={{ backgroundColor: "#00ff00" }}
-                onClick={() => handleColorChange("#00ff00")}
-              />
+              {StrokeButtomMap.map((btn, index) => (
+                <button
+                  key={index}
+                  className={colorButtonStyle}
+                  style={{ backgroundColor: btn.bgColor }}
+                  onClick={() => handleColorChange(btn.value)}
+                />
+              ))}
               <Separator
                 orientation="vertical"
                 className="h-6 mx-2 bg-gray-400 mr-4"
@@ -114,7 +137,7 @@ function UtilsTab() {
             </div>
           </div>
 
-          {Tool === "text" ? (
+          {Tool === "text" || ToggleTextutils ? (
             <FontButtons />
           ) : (
             <div>
@@ -122,21 +145,14 @@ function UtilsTab() {
               <div className="w-full mb-1">
                 <label className="text-[12px] w-full block">Background</label>
                 <div className="flex items-center">
-                  <button
-                    className={colorButtonStyle}
-                    style={{ backgroundColor: "#db8383" }}
-                    onClick={() => handleBgColorChange("#db8383")}
-                  />
-                  <button
-                    className={colorButtonStyle}
-                    style={{ backgroundColor: "#7d60f2" }}
-                    onClick={() => handleBgColorChange("#7d60f2")}
-                  />
-                  <button
-                    className={colorButtonStyle}
-                    style={{ backgroundColor: "#a1edaa" }}
-                    onClick={() => handleBgColorChange("#a1edaa")}
-                  />
+                  {BackGroundButtomMap.map((btn, index) => (
+                    <button
+                      key={index}
+                      className={colorButtonStyle}
+                      style={{ backgroundColor: btn.bgColor }}
+                      onClick={() => handleBgColorChange(btn.value)}
+                    />
+                  ))}
                   <Separator
                     orientation="vertical"
                     className="h-6 mx-2 bg-gray-400 mr-4"
@@ -156,42 +172,46 @@ function UtilsTab() {
               <div className="w-full mb-1">
                 <label className="text-[12px] w-full block">Stroke Width</label>
                 <div className="flex items-center">
-                  <button
-                    className={WidthsButtonStyle}
-                    onClick={() => handleStrokeWidth(2)}
-                    style={{ background: StrokeWidth === 2 ? "#85baf7" : null }}
-                  >
-                    <Minus size={8} />
-                  </button>
-                  <button
-                    className={WidthsButtonStyle}
-                    onClick={() => handleStrokeWidth(8)}
-                    style={{ background: StrokeWidth === 8 ? "#85baf7" : null }}
-                  >
-                    <Minus size={14} />
-                  </button>
-                  <button
-                    className={WidthsButtonStyle}
-                    onClick={() => handleStrokeWidth(14)}
-                    style={{
-                      background: StrokeWidth === 14 ? "#85baf7" : null,
-                    }}
-                  >
-                    <Minus size={20} />
-                  </button>
-                  <button
-                    className={WidthsButtonStyle}
-                    onClick={() => handleStrokeWidth(22)}
-                    style={{
-                      background: StrokeWidth === 22 ? "#85baf7" : null,
-                    }}
-                  >
-                    <Minus size={26} />
-                  </button>
+                  {StrokeWidthButtomMap.map((btn, index) => (
+                    <button
+                      key={index}
+                      className={WidthsButtonStyle}
+                      onClick={() => handleStrokeWidth(btn.value)}
+                      style={{
+                        background:
+                          StrokeWidth === btn.value ? "#85baf7" : null,
+                      }}
+                    >
+                      <Minus size={btn.iconSize} />
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
           )}
+
+          {/* {Edges} */}
+
+          <div>
+            <label className="text-[12px] w-full block">Edges</label>
+            <div className="flex items-center">
+              {EdgesButtonMap.map((btn, index) => {
+                const Icons = btn.icon;
+                return (
+                  <button
+                    key={index}
+                    className={colorButtonStyle}
+                    onClick={() => handleEdgesChange(btn.value)}
+                    style={{
+                      background: Edges === btn.value ? "#85baf7" : null,
+                    }}
+                  >
+                    <Icons size={22}/>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {/* Opacity */}
           <div className="w-full">

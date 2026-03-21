@@ -15,7 +15,28 @@ const FontButtonStyle = `
   flex items-center justify-center
   `;
 function FontButtons() {
-  const { setFontSize, FontSize } = useWhiteBoard();
+
+  const { setFontSize, FontSize, selectedIndex, setElements } = useWhiteBoard();
+
+  const patchSelected = (patch) => {
+    if (selectedIndex !== null) {
+      setElements((prev) =>
+        prev.map((el, i) => (i === selectedIndex ? { ...el, ...patch } : el))
+      );
+    }
+  };
+
+  const handleFontSize = (value) => {
+    setFontSize(value);
+    patchSelected({ FontSize: value }); // ← patch the actual element too
+  };
+
+  const fontButtonMap = [
+    { label: "S", value: 10 },
+    { label: "M", value: 14 },
+    { label: "L", value: 20 },
+    { label: "XL", value: 26 },
+  ];
 
   return (
     <>
@@ -52,27 +73,18 @@ function FontButtons() {
           </div> */}
 
       {/* {Font size} */}
-
-      <div>
-        <div className="w-full mb-1">
-          <label className="text-[12px] w-full block">Font Size</label>
-          <div className="flex items-center">
-            <button className={FontButtonStyle} style={{backgroundColor:FontSize === 10 ? "#85baf7" : null}} onClick={() => setFontSize(10)}>
-              <h1>S</h1>
+      <div className="flex">
+        {
+          fontButtonMap.map((btn, index) => (
+            <button
+              key={index} 
+              className={FontButtonStyle}
+              onClick={() => handleFontSize(btn.value)}
+              style={{ backgroundColor: FontSize === btn.value ? "#85baf7" : null }}
+            >
+              <h1>{btn.label}</h1>
             </button>
-
-            <button className={FontButtonStyle} onClick={() => setFontSize(14)}>
-              <h1>M</h1>
-            </button>
-            <button className={FontButtonStyle} onClick={() => setFontSize(20)}>
-              <h1>L</h1>
-            </button>
-
-            <button className={FontButtonStyle} onClick={() => setFontSize(26)}>
-              <h1>Xl</h1>
-            </button>
-          </div>
-        </div>
+          ))}
       </div>
 
       {/* text align*/}
