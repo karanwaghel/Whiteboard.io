@@ -10,6 +10,8 @@ import {
   ALargeSmall,
   MousePointer,
   LogOut as LogOutIcon,
+  Download,
+  UserCircle2 as Profile
 } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
@@ -31,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import { useWhiteBoard } from "@/ComponentProject/Context/DashBoardContext";
 import { useAuth } from "@/ComponentProject/Context/AuthContext";
 import { Separator } from "@/components/ui/separator";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const TOOLS = [
   { value: "cursor", label: "Selection", icon: MousePointer },
@@ -43,8 +46,38 @@ const TOOLS = [
   { value: "text", label: "Text", icon: ALargeSmall },
 ];
 
+
+const MenuMap = [
+  { label: "Profile", icon: Profile, action: () => {} },
+  { label: "Export PNG", icon: Download, action: () => onExport?.("png") },
+  { label: "Export JPG", icon: Download, action: () => onExport?.("jpg") },
+];
+
+  const itemClasses = `
+    w-10 h-10 rounded-xl transition-all duration-200
+    border-2 border-transparent
+    hover:bg-[#b5d6fc]
+    data-[state=on]:bg-[#85baf7]
+    data-[state=on]:border-2
+    data-[state=on]:border-[#0d417c]
+    
+  `;
+
+  const MenuItemStyle =`
+    flex justify-start items-center p-2 mb-1
+    cursor-pointer
+    border-2 border-transparent
+    rounded-xl transition-all duration-200
+    hover:bg-[#b5d6fc]
+    active:border-1
+    active:border-[#0d417c]
+    focus:border-1
+    focus:border-[#0d417c]
+  `
+
+
 export default function Toolbar() {
-  const { setTool, Tool, setElements,selectedIndex} = useWhiteBoard();
+  const { setTool, Tool, setElements, setSelectedIndex,OnExport} = useWhiteBoard();
   const { LogOut } = useAuth();
 
   const ToolTipButton = ({ children, label }) => (
@@ -58,33 +91,44 @@ export default function Toolbar() {
     setElements([]);
   };
 
-  const itemClasses = `
-    w-10 h-10 rounded-xl transition-all duration-200
-    border-2 border-transparent
-    hover:bg-[#b5d6fc]
-    data-[state=on]:bg-[#85baf7]
-    data-[state=on]:border-2
-    data-[state=on]:border-[#0d417c]
-    
-  `;
 
   return (
     <div className="h-16 w-full p-2 absolute top-0 left-0 ">
       <div className="flex justify-between items-center">
         <ToolTipButton label="Menu">
-          <Button
-            variant="ghost"
-            className="rounded-2xl w-10 h-10  shadow-md shadow-[#414753] z-50"
-          >
-            <Menu size={20} />
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                className="rounded-2xl w-10 h-10  shadow-md shadow-[#414753] z-50"
+              >
+                <Menu size={20} />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className=" w-56 p-2 mt-1 ml-1">
+              {
+                MenuMap.map((val,index)=>
+                  <div key={index} className={MenuItemStyle}>
+                    <val.icon size={16}
+                    onClick={val.action}/>
+                    <h3 className="text-sm ml-3">{val.label}</h3>
+                  </div>
+                )
+              }              
+            </PopoverContent>
+          </Popover>
         </ToolTipButton>
 
         <div className="shadow-md shadow-[#414753] rounded-full p-1 px-6 mt-2 bg-white border z-50">
           <ToggleGroup
             type="single"
             value={Tool}
-            onValueChange={(val) => val && setTool(val)}
+            onValueChange={(val) => {
+              if (val) {
+                setTool(val);
+                setSelectedIndex(null);
+              }
+            }}
             className="gap-2"
             defaultValue="cursor"
           >
@@ -122,8 +166,8 @@ export default function Toolbar() {
             <DialogContent className="!p-8">
               <DialogHeader>
                 <DialogTitle className="text-lg">Reset Canvas</DialogTitle>
-                <Separator className="!mt-2 !mb-4"/>
-                <DialogDescription >
+                <Separator className="!mt-2 !mb-4" />
+                <DialogDescription>
                   Are you sure you want to reset the canvas?
                 </DialogDescription>
               </DialogHeader>
@@ -131,10 +175,12 @@ export default function Toolbar() {
                 <DialogClose asChild>
                   <Button variant="outline">Cancel</Button>
                 </DialogClose>
-                <DialogClose
-                  asChild
-                >
-                  <Button onClick={ResetCanvas} variant="destructive" className="ml-8">
+                <DialogClose asChild>
+                  <Button
+                    onClick={ResetCanvas}
+                    variant="destructive"
+                    className="ml-8"
+                  >
                     Reset
                   </Button>
                 </DialogClose>

@@ -38,8 +38,9 @@ function HomePage() {
     setStrokeWidth,
     setOpacity,
     setbackgroundColor,
-    setToggleTextutils,
     Edges,
+    setEdges,
+    setOnExport,
   } = useWhiteBoard();
 
   const stageref = useRef(null);
@@ -83,7 +84,7 @@ function HomePage() {
         fillEnabled={true}
         fill={el.backgroundColor}
         fillAfterStrokeEnabled={true}
-        cornerRadius={el.edges}
+        cornerRadius={el.Edges}
         opacity={el.Opacity}
       />
     ),
@@ -140,7 +141,7 @@ function HomePage() {
     const pointBasedTools = ["pen", "arrow", "line"];
 
     if (selectedIndex !== null) {
-      const selectedEl = Elements.current[selectedIndex];
+      const selectedEl = ElementsRef.current?.[selectedIndex];
 
       if (selectedEl && pointBasedTools.includes(selectedEl.Tool)) {
         transformerRef.current.nodes([]);
@@ -197,7 +198,7 @@ function HomePage() {
             StrokeWidth,
             FontSize,
             text: "",
-            edges: Edges,
+            Edges: Edges,
           },
         ];
       });
@@ -245,9 +246,59 @@ function HomePage() {
   };
 
   const handleMouseUp = () => {
-    setisDrawing(false);
-    if (Tool !== "text") setTool("cursor");
-  };
+  setisDrawing(false);
+
+  if (Tool !== "text" && Tool !== "pen" && Tool !== "eraser") {
+    setElements((prev) => {
+      const newIndex = prev.length - 1;
+      setSelectedIndex(newIndex);
+
+      const newEl = prev[newIndex];
+      if (newEl) {
+        setColor(newEl.Color);
+        setbackgroundColor(newEl.backgroundColor);
+        setOpacity(newEl.Opacity);
+        setStrokeWidth(newEl.StrokeWidth);
+        setEdges(newEl.Edges);
+      }
+
+      return prev;
+    });
+  }
+
+  if (Tool !== "text") setTool("cursor");
+};
+
+
+  const  handleDownload = (format = "png")=>{
+    const stage = stageref.current
+    if(!stage) return;
+
+     const prevSelected = selectedIndex;
+      setSelectedIndex(null)
+
+      setTimeout(()=>{
+        const dataURL = stage.toDataURL({
+          mimeType:format === 'jpg' ? 'image/jpg':'image/png',
+          quality:1,
+          pixelRatio:2
+        });
+
+        const link = document.createElement('a');
+        link.download = `whiteboard.${format}`;
+        link.href = dataURL;
+        link.click()
+
+        setSelectedIndex(prevSelected);
+
+      },100);
+  }
+
+  useEffect(()=>{
+    setOnExport(()=>handleDownload)
+  },[])
+  
+
 
   return (
     <div
@@ -350,17 +401,13 @@ function HomePage() {
                 }}
                 onClick={() => {
                   if (Tool === "cursor") {
-                    if (el.Tool === "text") {
-                      setToggleTextutils(true);
-                    } else {
-                      setToggleTextutils(false);
-                    }
                     setSelectedIndex(realIndex);
                     setFontSize(el.FontSize);
                     setColor(el.Color);
                     setbackgroundColor(el.backgroundColor);
                     setOpacity(el.Opacity);
                     setStrokeWidth(el.StrokeWidth);
+                    setEdges(el.Edges);
                   }
                 }}
                 draggable={Tool === "cursor"}

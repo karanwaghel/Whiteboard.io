@@ -29,6 +29,19 @@ const WidthsButtonStyle = `
   flex items-center justify-center
   `;
 
+const EdgesButtonStyle = `
+  rounded-lg h-6 w-7 my-2
+  bg-sky-50
+  hover:scale-110
+  hover:bg-[#b5d6fc]
+  active:scale-95
+  transition-transform
+  mr-3
+  active:bg-[#85baf7]
+  focus:bg-[#85baf7]
+  flex items-center justify-center
+  `;
+
 function UtilsTab() {
   const [showPicker, setshowpicker] = useState(false);
   const [showBgColorPicker, setshowBgColorPicker] = useState(false);
@@ -44,10 +57,13 @@ function UtilsTab() {
     setOpacity,
     selectedIndex,
     setElements,
-    ToggleTextutils,
     Edges,
     setEdges,
+    Elements,
   } = useWhiteBoard();
+
+  const SelectedEl = selectedIndex !== null ? Elements[selectedIndex] : null;
+  const SelectedTool = SelectedEl ? SelectedEl.Tool : null;
 
   const patchSelected = (patch) => {
     if (selectedIndex !== null) {
@@ -137,7 +153,7 @@ function UtilsTab() {
             </div>
           </div>
 
-          {Tool === "text" || ToggleTextutils ? (
+          {Tool === "text" || SelectedTool === "text" ? (
             <FontButtons />
           ) : (
             <div>
@@ -191,26 +207,29 @@ function UtilsTab() {
           )}
 
           {/* {Edges} */}
-
           <div>
-            <label className="text-[12px] w-full block">Edges</label>
-            <div className="flex items-center">
-              {EdgesButtonMap.map((btn, index) => {
-                const Icons = btn.icon;
-                return (
-                  <button
-                    key={index}
-                    className={colorButtonStyle}
-                    onClick={() => handleEdgesChange(btn.value)}
-                    style={{
-                      background: Edges === btn.value ? "#85baf7" : null,
-                    }}
-                  >
-                    <Icons size={22}/>
-                  </button>
-                );
-              })}
-            </div>
+            {(Tool === "square" || SelectedTool === "square") && (
+              <div>
+                <label className="text-[12px] w-full block">Edges</label>
+                <div className="flex items-center">
+                  {EdgesButtonMap.map((btn, index) => {
+                    const Icon = btn.icon;
+                    return (
+                      <button
+                        key={index}
+                        className={EdgesButtonStyle}
+                        onClick={() => handleEdgesChange(btn.value)}
+                        style={{
+                          background: Edges === btn.value ? "#85baf7" : null,
+                        }}
+                      >
+                        <Icon size={14} />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Opacity */}
