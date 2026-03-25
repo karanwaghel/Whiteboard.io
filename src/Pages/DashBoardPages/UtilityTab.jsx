@@ -148,7 +148,7 @@ function UtilsTab() {
                   setshowpicker((prev) => !prev);
                   if (showBgColorPicker) setshowBgColorPicker(false);
                 }}
-                style={{ backgroundColor: Color }}
+                style={{ backgroundColor: Color,height:'26px', width:'26px'}}
               />
             </div>
           </div>
@@ -165,7 +165,7 @@ function UtilsTab() {
                     <button
                       key={index}
                       className={colorButtonStyle}
-                      style={{ backgroundColor: btn.bgColor }}
+                      style={{ backgroundColor: btn.bgColor}}
                       onClick={() => handleBgColorChange(btn.value)}
                     />
                   ))}
@@ -179,7 +179,7 @@ function UtilsTab() {
                       setshowBgColorPicker((prev) => !prev);
                       if (showPicker) setshowpicker(false);
                     }}
-                    style={{ backgroundColor: backgroundColor }}
+                    style={{ backgroundColor: backgroundColor,height:'26px', width:'26px'}}
                   />
                 </div>
               </div>

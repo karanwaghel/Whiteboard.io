@@ -40,7 +40,8 @@ function HomePage() {
     setbackgroundColor,
     Edges,
     setEdges,
-    setOnExport,
+    OnExportRef,
+    CanvaColor,
   } = useWhiteBoard();
 
   const stageref = useRef(null);
@@ -246,259 +247,257 @@ function HomePage() {
   };
 
   const handleMouseUp = () => {
-  setisDrawing(false);
+    setisDrawing(false);
 
-  if (Tool !== "text" && Tool !== "pen" && Tool !== "eraser") {
-    setElements((prev) => {
-      const newIndex = prev.length - 1;
-      setSelectedIndex(newIndex);
+    if (Tool !== "text" && Tool !== "pen" && Tool !== "eraser") {
+      setElements((prev) => {
+        const newIndex = prev.length - 1;
+        setSelectedIndex(newIndex);
 
-      const newEl = prev[newIndex];
-      if (newEl) {
-        setColor(newEl.Color);
-        setbackgroundColor(newEl.backgroundColor);
-        setOpacity(newEl.Opacity);
-        setStrokeWidth(newEl.StrokeWidth);
-        setEdges(newEl.Edges);
-      }
+        const newEl = prev[newIndex];
+        if (newEl) {
+          setColor(newEl.Color);
+          setbackgroundColor(newEl.backgroundColor);
+          setOpacity(newEl.Opacity);
+          setStrokeWidth(newEl.StrokeWidth);
+          setEdges(newEl.Edges);
+        }
 
-      return prev;
-    });
-  }
+        return prev;
+      });
+    }
 
-  if (Tool !== "text") setTool("cursor");
-};
+    if (Tool !== "text") setTool("cursor");
+  };
 
+  const handleDownload = (format = "png") => {
+    const stage = stageref.current;
+    if (!stage) return;
 
-  const  handleDownload = (format = "png")=>{
-    const stage = stageref.current
-    if(!stage) return;
+    const prevSelected = selectedIndex;
+    setSelectedIndex(null);
 
-     const prevSelected = selectedIndex;
-      setSelectedIndex(null)
+    setTimeout(() => {
+      const dataURL = stage.toDataURL({
+        mimeType: format === "jpg" ? "image/jpg" : "image/png",
+        quality: 1,
+        pixelRatio: 2,
+      });
 
-      setTimeout(()=>{
-        const dataURL = stage.toDataURL({
-          mimeType:format === 'jpg' ? 'image/jpg':'image/png',
-          quality:1,
-          pixelRatio:2
-        });
+      const link = document.createElement("a");
+      link.download = `whiteboard.${format}`;
+      link.href = dataURL;
+      link.click();
 
-        const link = document.createElement('a');
-        link.download = `whiteboard.${format}`;
-        link.href = dataURL;
-        link.click()
+      setSelectedIndex(prevSelected);
+    }, 100);
+  };
 
-        setSelectedIndex(prevSelected);
-
-      },100);
-  }
-
-  useEffect(()=>{
-    setOnExport(()=>handleDownload)
-  },[])
-  
-
+  useEffect(() => {
+    OnExportRef.current = handleDownload;
+  }, []);
 
   return (
-    <div
-      className="h-screen w-screen overflow-hidden relative"
-      onMouseDown={() => {
-        if (EditingText) return;
-      }}
-    >
-      <TooltipProvider delayDuration={300}>
+    <TooltipProvider delayDuration={300}>
+      <div
+        className="h-screen w-screen overflow-hidden relative"
+        onMouseDown={() => {
+          if (EditingText) return;
+        }}
+      >
+        {/* {Toolbar} */}
+        
         <Toolbar />
-      </TooltipProvider>
 
-      {(Tool !== "cursor" && Tool !== "eraser") || selectedIndex !== null ? (
-        <UtilsTab config={ActiveTool} />
-      ) : null}
+        {(Tool !== "cursor" && Tool !== "eraser") || selectedIndex !== null ? (
+          <UtilsTab config={ActiveTool} />
+        ) : null}
 
-      {EditingText && (
-        <input
-          autoFocus
-          value={EditingText.text}
-          onChange={(e) =>
-            setEditingText({ ...EditingText, text: e.target.value })
-          }
-          onBlur={(e) => {
-            setElements((prev) =>
-              prev.map((el, index) =>
-                index === EditingText.index
-                  ? { ...el, text: e.target.value }
-                  : el,
-              ),
-            );
-            setEditingText(null);
-            setTool("cursor");
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") e.target.blur();
-            if (e.key === "Escape") {
+        {EditingText && (
+          <input
+            autoFocus
+            value={EditingText.text}
+            onChange={(e) =>
+              setEditingText({ ...EditingText, text: e.target.value })
+            }
+            onBlur={(e) => {
+              setElements((prev) =>
+                prev.map((el, index) =>
+                  index === EditingText.index
+                    ? { ...el, text: e.target.value }
+                    : el,
+                ),
+              );
               setEditingText(null);
               setTool("cursor");
-            }
-          }}
-          style={{
-            position: "absolute",
-            left: EditingText.x,
-            top: EditingText.y,
-            outline: "none",
-            color: Color,
-            fontSize: FontSize,
-            zIndex: 100,
-            minWidth: "100px",
-            background: "transparent",
-            pointerEvents: "all",
-          }}
-        />
-      )}
-
-      <Stage
-        height={window.innerHeight}
-        width={window.innerWidth}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseMove={handleMouseMove}
-        style={{
-          cursor: cursorMap[Tool] || "default",
-          position: "absolute",
-          top: 0,
-          left: 0,
-          pointerEvents: EditingText ? "none" : "all",
-        }}
-        ref={stageref}
-      >
-        <Layer>
-          <Rect
-            x={0}
-            y={0}
-            width={window.innerWidth}
-            height={window.innerHeight}
-            fill="white"
-            onClick={() => setSelectedIndex(null)}
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.target.blur();
+              if (e.key === "Escape") {
+                setEditingText(null);
+                setTool("cursor");
+              }
+            }}
+            style={{
+              position: "absolute",
+              left: EditingText.x,
+              top: EditingText.y,
+              outline: "none",
+              color: Color,
+              fontSize: FontSize,
+              zIndex: 100,
+              minWidth: "100px",
+              background: "transparent",
+              pointerEvents: "all",
+            }}
           />
+        )}
 
-          {Elements.map((el, realIndex) => {
-            if (el.Tool === "eraser")
+        <Stage
+          height={window.innerHeight}
+          width={window.innerWidth}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+          style={{
+            cursor: cursorMap[Tool] || "default",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            pointerEvents: EditingText ? "none" : "all",
+          }}
+          ref={stageref}
+        >
+          <Layer>
+            <Rect
+              x={0}
+              y={0}
+              width={window.innerWidth}
+              height={window.innerHeight}
+              fill={CanvaColor}
+              onClick={() => setSelectedIndex(null)}
+            />
+
+            {Elements.map((el, realIndex) => {
+              if (el.Tool === "eraser")
+                return (
+                  <Line
+                    key={realIndex}
+                    points={el.Points}
+                    stroke={el.Color}
+                    strokeWidth={el.StrokeWidth}
+                    lineCap="round"
+                    lineJoin="round"
+                    globalCompositeOperation="destination-out"
+                  />
+                );
               return (
-                <Line
+                <Group
                   key={realIndex}
-                  points={el.Points}
-                  stroke={el.Color}
-                  strokeWidth={el.StrokeWidth}
-                  lineCap="round"
-                  lineJoin="round"
-                  globalCompositeOperation="destination-out"
-                />
-              );
-            return (
-              <Group
-                key={realIndex}
-                ref={(node) => {
-                  groupRef.current[realIndex] = node;
-                }}
-                onClick={() => {
-                  if (Tool === "cursor") {
-                    setSelectedIndex(realIndex);
-                    setFontSize(el.FontSize);
-                    setColor(el.Color);
-                    setbackgroundColor(el.backgroundColor);
-                    setOpacity(el.Opacity);
-                    setStrokeWidth(el.StrokeWidth);
-                    setEdges(el.Edges);
+                  ref={(node) => {
+                    groupRef.current[realIndex] = node;
+                  }}
+                  onClick={() => {
+                    if (Tool === "cursor") {
+                      setSelectedIndex(realIndex);
+                      setFontSize(el.FontSize);
+                      setColor(el.Color);
+                      setbackgroundColor(el.backgroundColor);
+                      setOpacity(el.Opacity);
+                      setStrokeWidth(el.StrokeWidth);
+                      setEdges(el.Edges);
+                    }
+                  }}
+                  draggable={Tool === "cursor"}
+                  x={
+                    ["pen", "arrow", "line"].includes(el.Tool)
+                      ? 0
+                      : (el.x || 0) + (el.width || 0) / 2
                   }
-                }}
-                draggable={Tool === "cursor"}
-                x={
-                  ["pen", "arrow", "line"].includes(el.Tool)
-                    ? 0
-                    : (el.x || 0) + (el.width || 0) / 2
-                }
-                y={
-                  ["pen", "arrow", "line"].includes(el.Tool)
-                    ? 0
-                    : (el.y || 0) + (el.height || 0) / 2
-                }
-                offsetX={(el.width || 0) / 2}
-                offsetY={(el.height || 0) / 2}
-                rotation={el.rotation || 0}
-                onDragEnd={(e) => {
-                  const node = e.target;
+                  y={
+                    ["pen", "arrow", "line"].includes(el.Tool)
+                      ? 0
+                      : (el.y || 0) + (el.height || 0) / 2
+                  }
+                  offsetX={(el.width || 0) / 2}
+                  offsetY={(el.height || 0) / 2}
+                  rotation={el.rotation || 0}
+                  onDragEnd={(e) => {
+                    const node = e.target;
+                    setElements((prev) =>
+                      prev.map((Item, index) =>
+                        index === realIndex
+                          ? {
+                              ...Item,
+                              x: node.x() - (Item.width || 0) / 2,
+                              y: node.y() - (Item.height || 0) / 2,
+                              rotation: node.rotation(),
+                            }
+                          : Item,
+                      ),
+                    );
+                  }}
+                >
+                  {ToolsMap[el.Tool]?.(el)}
+                </Group>
+              );
+            })}
+
+            {/* {transformer} */}
+
+            {Tool !== "eraser" && (
+              <Transformer
+                ref={transformerRef}
+                borderStroke="#4A90E2"
+                borderStrokeWidth={1}
+                anchorStroke="#4A90E2"
+                anchorFill="white"
+                anchorSize={8}
+                anchorCornerRadius={5}
+                rotateEnabled={true}
+                onTransformEnd={(e) => {
+                  const node = groupRef.current[selectedIndex];
+                  const scaleX = node.scaleX();
+                  const scaleY = node.scaleY();
+                  const rotation = node.rotation();
+
+                  node.scaleX(1);
+                  node.scaleY(1);
+
                   setElements((prev) =>
-                    prev.map((Item, index) =>
-                      index === realIndex
-                        ? {
-                            ...Item,
-                            x: node.x() - (Item.width || 0) / 2,
-                            y: node.y() - (Item.height || 0) / 2,
-                            rotation: node.rotation(),
-                          }
-                        : Item,
-                    ),
+                    prev.map((el, index) => {
+                      if (index !== selectedIndex) return el;
+
+                      const newWidth = el.width * scaleX;
+                      const newHeight = el.height * scaleY;
+
+                      const updatedPoints =
+                        el.Points && ["arrow", "line", "pen"].includes(el.Tool)
+                          ? el.Points.map((p, i) =>
+                              i % 2 === 0 ? p * scaleX : p * scaleY,
+                            )
+                          : el.Points;
+
+                      return {
+                        ...el,
+                        x: node.x() - newWidth / 2,
+                        y: node.y() - newHeight / 2,
+                        width: newWidth,
+                        height: newHeight,
+                        offsetX: newWidth / 2,
+                        offsetY: newHeight / 2,
+                        rotation,
+                        Points: updatedPoints,
+                      };
+                    }),
                   );
                 }}
-              >
-                {ToolsMap[el.Tool]?.(el)}
-              </Group>
-            );
-          })}
-
-          {/* {transformer} */}
-
-          {Tool !== "eraser" && (
-            <Transformer
-              ref={transformerRef}
-              borderStroke="#4A90E2"
-              borderStrokeWidth={1}
-              anchorStroke="#4A90E2"
-              anchorFill="white"
-              anchorSize={8}
-              anchorCornerRadius={5}
-              rotateEnabled={true}
-              onTransformEnd={(e) => {
-                const node = groupRef.current[selectedIndex];
-                const scaleX = node.scaleX();
-                const scaleY = node.scaleY();
-                const rotation = node.rotation();
-
-                node.scaleX(1);
-                node.scaleY(1);
-
-                setElements((prev) =>
-                  prev.map((el, index) => {
-                    if (index !== selectedIndex) return el;
-
-                    const newWidth = el.width * scaleX;
-                    const newHeight = el.height * scaleY;
-
-                    const updatedPoints =
-                      el.Points && ["arrow", "line", "pen"].includes(el.Tool)
-                        ? el.Points.map((p, i) =>
-                            i % 2 === 0 ? p * scaleX : p * scaleY,
-                          )
-                        : el.Points;
-
-                    return {
-                      ...el,
-                      x: node.x() - newWidth / 2,
-                      y: node.y() - newHeight / 2,
-                      width: newWidth,
-                      height: newHeight,
-                      offsetX: newWidth / 2,
-                      offsetY: newHeight / 2,
-                      rotation,
-                      Points: updatedPoints,
-                    };
-                  }),
-                );
-              }}
-            />
-          )}
-        </Layer>
-      </Stage>
-    </div>
+              />
+            )}
+          </Layer>
+        </Stage>
+      </div>
+    </TooltipProvider>
   );
 }
 

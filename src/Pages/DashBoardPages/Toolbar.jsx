@@ -1,7 +1,6 @@
 import {
   Pen,
   EraserIcon,
-  Menu,
   Square,
   Trash2Icon,
   Circle,
@@ -10,8 +9,6 @@ import {
   ALargeSmall,
   MousePointer,
   LogOut as LogOutIcon,
-  Download,
-  UserCircle2 as Profile
 } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
@@ -33,7 +30,7 @@ import { Button } from "@/components/ui/button";
 import { useWhiteBoard } from "@/ComponentProject/Context/DashBoardContext";
 import { useAuth } from "@/ComponentProject/Context/AuthContext";
 import { Separator } from "@/components/ui/separator";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import Sidebar from "./Sidebar";
 
 const TOOLS = [
   { value: "cursor", label: "Selection", icon: MousePointer },
@@ -46,14 +43,7 @@ const TOOLS = [
   { value: "text", label: "Text", icon: ALargeSmall },
 ];
 
-
-const MenuMap = [
-  { label: "Profile", icon: Profile, action: () => {} },
-  { label: "Export PNG", icon: Download, action: () => onExport?.("png") },
-  { label: "Export JPG", icon: Download, action: () => onExport?.("jpg") },
-];
-
-  const itemClasses = `
+const itemClasses = `
     w-10 h-10 rounded-xl transition-all duration-200
     border-2 border-transparent
     hover:bg-[#b5d6fc]
@@ -63,21 +53,8 @@ const MenuMap = [
     
   `;
 
-  const MenuItemStyle =`
-    flex justify-start items-center p-2 mb-1
-    cursor-pointer
-    border-2 border-transparent
-    rounded-xl transition-all duration-200
-    hover:bg-[#b5d6fc]
-    active:border-1
-    active:border-[#0d417c]
-    focus:border-1
-    focus:border-[#0d417c]
-  `
-
-
 export default function Toolbar() {
-  const { setTool, Tool, setElements, setSelectedIndex,OnExport} = useWhiteBoard();
+  const { setTool, Tool, setElements, setSelectedIndex } = useWhiteBoard();
   const { LogOut } = useAuth();
 
   const ToolTipButton = ({ children, label }) => (
@@ -91,34 +68,10 @@ export default function Toolbar() {
     setElements([]);
   };
 
-
   return (
-    <div className="h-16 w-full p-2 absolute top-0 left-0 ">
+    <div className="h-16 w-full p-2 pr-4 absolute top-0 left-0 ">
       <div className="flex justify-between items-center">
-        <ToolTipButton label="Menu">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                className="rounded-2xl w-10 h-10  shadow-md shadow-[#414753] z-50"
-              >
-                <Menu size={20} />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className=" w-56 p-2 mt-1 ml-1">
-              {
-                MenuMap.map((val,index)=>
-                  <div key={index} className={MenuItemStyle}>
-                    <val.icon size={16}
-                    onClick={val.action}/>
-                    <h3 className="text-sm ml-3">{val.label}</h3>
-                  </div>
-                )
-              }              
-            </PopoverContent>
-          </Popover>
-        </ToolTipButton>
-
+        <Sidebar />
         <div className="shadow-md shadow-[#414753] rounded-full p-1 px-6 mt-2 bg-white border z-50">
           <ToggleGroup
             type="single"

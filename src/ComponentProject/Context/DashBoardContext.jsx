@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 
 export const useWhiteBoard = () => {
   return useContext(WhiteboardContext);
@@ -20,7 +20,9 @@ const WhiteBoardContextProvider = ({ children }) => {
   const [FontSize, setFontSize] = useState(10);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [Edges, setEdges] = useState(22);
-  const [onExport,setOnExport] = useState()
+  const [CanvaColor, setCanvaColor] = useState("#ffffff");
+
+  const OnExportRef = useRef(null);
 
   const value = {
     Tool,
@@ -47,8 +49,11 @@ const WhiteBoardContextProvider = ({ children }) => {
     setFontSize,
     selectedIndex,
     setSelectedIndex,
-    Edges,setEdges,
-    onExport,setOnExport,
+    Edges,
+    setEdges,
+    OnExportRef,
+    CanvaColor,
+    setCanvaColor,
   };
   return (
     <>
