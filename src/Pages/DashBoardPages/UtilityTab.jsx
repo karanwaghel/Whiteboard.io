@@ -124,7 +124,7 @@ function UtilsTab() {
 
   return (
     <>
-      <div className="absolute top-[15%] left-4 w-44 h-80 transition-all duration-500 z-50">
+      <div className="absolute top-[15%] left-4 w-44 h-80 transition-all duration-500 z-50 bg-white">
         <div className="shadow-md shadow-black rounded-md p-2 flex flex-col items-start justify-start w-full h-full">
           {/* Stroke */}
           <div className="w-full mb-1">
@@ -250,13 +250,13 @@ function UtilsTab() {
       </div>
 
       {showPicker && (
-        <div className="absolute z-10 top-36 left-52 p-4 rounded-2xl rounded-tl-none shadow-md shadow-black">
+        <div className="absolute z-10 top-36 left-52 p-4 rounded-2xl rounded-tl-none shadow-md shadow-black bg-white">
           <HexColorPicker color={Color} onChange={handleColorChange} />
         </div>
       )}
 
       {showBgColorPicker && (
-        <div className="absolute z-10 top-52 left-52 p-4 rounded-2xl rounded-tl-none shadow-md shadow-black">
+        <div className="absolute z-10 top-52 left-52 p-4 rounded-2xl rounded-tl-none shadow-md shadow-black bg-white">
           <HexColorPicker
             color={backgroundColor}
             onChange={handleBgColorChange}
