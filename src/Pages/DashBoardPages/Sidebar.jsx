@@ -1,7 +1,8 @@
 import { useWhiteBoard } from "@/ComponentProject/Context/DashBoardContext";
 import { HexColorInput } from "react-colorful";
+import { Toaster, toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
-import { Download, UserCircle2 as Profile, Menu } from "lucide-react";
+import { Download, UserCircle2 as Profile, Menu, Save } from "lucide-react";
 import { useState } from "react";
 import {
   Popover,
@@ -14,6 +15,7 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { useAuth } from "@/ComponentProject/Context/AuthContext";
+import AddBoard from "@/ComponentProject/Services/firestore";
 
 const canvasBackgroundMap = [
   { value: "#ffffff", background: "#ffffff" },
@@ -43,17 +45,33 @@ const CanvaColorButton = `
   `;
 
 export default function Sidebar() {
-  const { CanvaColor, setCanvaColor, OnExportRef } = useWhiteBoard();
+  const { CanvaColor, setCanvaColor, OnExportRef, Elements } = useWhiteBoard();
   const [showCanvaPicker, setshowCanvaPicker] = useState(false);
   const [showUser, setshowUser] = useState(false);
   const { CurrentUser } = useAuth();
+
+  const handelAddBoard = async () => {
+    const ToastId = toast.loading("Saving...");
+    try {
+      await AddBoard(CurrentUser.uid, Elements, CanvaColor);
+
+      toast.success("Saved Successfully!", {
+        id: ToastId,
+      });
+    } catch (error) {
+      toast.error("Error, Cannot Save!", {
+        id: ToastId,
+      });
+    }
+  };
 
   const MenuMap = [
     {
       label: "Profile",
       icon: Profile,
-      action: () => {setshowUser((prev) => !prev)
-        console.log(CurrentUser)
+      action: () => {
+        setshowUser((prev) => !prev);
+        console.log(CurrentUser);
       },
     },
     {
@@ -61,25 +79,31 @@ export default function Sidebar() {
       icon: Download,
       action: () => OnExportRef.current?.("png"),
     },
+    {
+      label: "Save",
+      icon: Save,
+      action: handelAddBoard,
+    },
   ];
 
   return (
     <div className="relative z-50 pl-2">
-      <Popover onOpenChange={(open)=>{
-        if(!open){
-          setshowCanvaPicker(false);
-          setshowUser(false)
-        }
-      }}
-         >
+      <Popover
+        onOpenChange={(open) => {
+          if (!open) {
+            setshowCanvaPicker(false);
+            setshowUser(false);
+          }
+        }}
+      >
         <Tooltip>
           <TooltipTrigger asChild>
-            <PopoverTrigger asChild >
+            <PopoverTrigger asChild>
               <div
                 className="rounded-2xl w-9 h-9 shadow-md shadow-[#414753] z-50 
                      flex items-center justify-center cursor-pointer
                      hover:bg-accent bg-white"
-                >
+              >
                 <Menu size={20} />
               </div>
             </PopoverTrigger>
@@ -100,13 +124,13 @@ export default function Sidebar() {
 
           {/* {userBlock} */}
 
-          {
-            showUser && (
-              <div className=" w-56 absolute z-50 top-3 left-56 p-3 ml-2 rounded-xl  shadow-md shadow-black">
-                <h4 className="text-xs flex flex-wrap">Email: {CurrentUser.email}</h4>
-              </div>
-            )
-          }
+          {showUser && (
+            <div className=" w-56 absolute z-50 top-3 left-56 p-3 ml-2 rounded-xl  shadow-md shadow-black">
+              <h4 className="text-xs flex flex-wrap">
+                Email: {CurrentUser.email}
+              </h4>
+            </div>
+          )}
 
           <Separator className=" w-44 ml-2 my-2" />
 

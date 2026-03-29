@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { commonSchema } from "@/ComponentProject/schemas/authschema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import LoadingSpinner from "./Spinner";
+
 
 function LogInPage() {
   const { Login, LoginWithGoogle,getFirebaseErrorMessage,Loading} = useAuth();

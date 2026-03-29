@@ -13,8 +13,12 @@ import {
   Transformer,
 } from "react-konva";
 import { useRef, useEffect } from "react";
-import UtilsTab from "./UtilityTab";
 import { Tools_config } from "@/ComponentProject/config/ToolsConfig";
+import { getDoc,doc} from "firebase/firestore";
+import { db } from "@/ComponentProject/config/firebase";
+import { useAuth } from "@/ComponentProject/Context/AuthContext";
+import UtilsTab from "./UtilityTab";
+
 
 function HomePage() {
   const {
@@ -42,7 +46,9 @@ function HomePage() {
     setEdges,
     OnExportRef,
     CanvaColor,
+    setCanvaColor,
   } = useWhiteBoard();
+  const { CurrentUser } = useAuth();
 
   const stageref = useRef(null);
   const newTextIndexRef = useRef(null);
@@ -297,6 +303,29 @@ function HomePage() {
     OnExportRef.current = handleDownload;
   }, []);
 
+  // {Fetching Board useEffect}
+
+  useEffect(() => {
+    if(!CurrentUser) return;
+
+    const LoadBoard = async () => {
+      try {
+       const docRef = doc(db,"boards",CurrentUser.uid)
+       const snapshot = await getDoc(docRef);
+
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          setElements(data.elements || []);
+          setCanvaColor(data.canvacolor || '#ffffff')
+        }
+      } catch (e) {
+        console.error("Error loading board:", e);
+      }
+    };
+
+    LoadBoard();
+  },[CurrentUser]);
+
   return (
     <TooltipProvider delayDuration={300}>
       <div
@@ -306,7 +335,7 @@ function HomePage() {
         }}
       >
         {/* {Toolbar} */}
-        
+
         <Toolbar />
 
         {(Tool !== "cursor" && Tool !== "eraser") || selectedIndex !== null ? (

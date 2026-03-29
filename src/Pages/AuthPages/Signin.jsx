@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/ComponentProject/Context/AuthContext";
 import { toast } from "sonner";
@@ -19,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { commonSchema } from "@/ComponentProject/schemas/authschema";
 
 function SignIn() {
-  const { CurrentUser, SignIn, getFirebaseErrorMessage } = useAuth();
+  const {SignIn, getFirebaseErrorMessage } = useAuth();
   const {
     register,
     handleSubmit,
